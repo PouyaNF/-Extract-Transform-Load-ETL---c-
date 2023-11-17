@@ -1,6 +1,10 @@
 // File: DataHandler.h
-// Description: A class for handling and processing data.
-
+// Description: A class for handling and processing data:
+// - allocation memory
+// - Reading data
+// - Splitting data: training, test, validation
+// - Counting the number of classes in the dataset
+// Convert to little endian
 
 #ifndef INC_8_TRAINING_MNIST_DATAHANDLER_H
 #define INC_8_TRAINING_MNIST_DATAHANDLER_H
@@ -13,13 +17,10 @@
 #include <unordered_set>
 #include "Data.h"
 
-// Data manipulation logics:
-// - allocation memory
-// - Reading data
-// - Splitting data: training, test, validation
-// - Counting the number of classes in the dataset
+
 class DataHandler {
     // Vectors containing data
+    // Array of Data (each Data keeps featureVector for one image)
     std::vector<Data*> *dataArray;
     std::vector<Data*> *trainingData;
     std::vector<Data*> *testData;

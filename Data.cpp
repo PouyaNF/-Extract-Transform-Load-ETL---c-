@@ -2,6 +2,12 @@
 
 #include "Data.h"
 
+Data::Data() {
+    // initializing the featureVector in Data constructor
+    featureVector = new std::vector<uint8_t>;
+}
+
+Data::~Data() = default;
 
 // Set the featureVector for the data.
 void Data::setFeatureVector(std::vector<uint8_t> * vect)
@@ -53,8 +59,4 @@ const std::vector<uint8_t>* Data::getFeatureVector() const
 
 }
 
-Data::Data() {
-    featureVector = new std::vector<uint8_t>;
-}
 
-Data::~Data() = default;

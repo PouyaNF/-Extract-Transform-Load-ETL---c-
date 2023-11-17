@@ -4,7 +4,7 @@
 
 DataHandler::DataHandler()
 {
-    //dynamically allocate memory to each dataset
+    //dynamically allocating memory to each dataset on the heap
     dataArray =  new std::vector<Data *>;
     testData = new std::vector<Data *>;
     trainingData = new std::vector<Data *>;
@@ -19,33 +19,37 @@ DataHandler::~DataHandler() = default;
 void DataHandler::readFeatureData(const std::string &path)
 {
     // to store header
-    uint32_t header[4];  //32 bit unsigned integer array : Magic, num of images, row size, col size
+    uint32_t header[4];  //32 bits unsigned integer array : Magic, num of images, row size, col size
     // to keep binary data
+    //Using unsigned char for raw binary data
     unsigned char bytes[4];
     //opens the file specified by the path
     FILE *f = fopen(path.c_str(), "r");
     if (f)
     {
-        //reading the first 4 bytes of data (header)
+        //reading the first 4 bytes of header
         for (int i =0; i<4 ; i++)
         {
+            // if successfully reads one element of size sizeof(bytes)
             if (fread(bytes,sizeof(bytes), 1, f))
             {
                 //handle potential endianness differences between the data in the file and the system's native endianness
                 header[i] = convertToLittleEndian(bytes);
             }
         }
-        printf ("done getting file header.\n");
-        int imageSize = header[2] * header[3];
+        printf ("done getting input file header.\n");
 
-        // for number of images in binary file
+        // getting number of all images
+        int imageSize = static_cast<int>(header[2] * header[3]);
+
+        // for all number of images in binary file
         for (int i =0; i < header[1]; i++)
         {
             Data * d = new Data();
-            uint8_t element[1];
+            uint8_t element[1]; // 1 byte
             for (int j = o; j < imageSize; j++)
             {
-                //reading image data and store in element[0]
+                //reading image data and store in element
                 if(fread(element, sizeof(element), 1, f))
                 {
                     d->appendToFeatureVector(element[0]);
@@ -56,9 +60,10 @@ void DataHandler::readFeatureData(const std::string &path)
                     exit(1);
                 }
             }
+
             dataArray ->push_back(d);
         }
-        printf("Successfully read data and store to feature vector  \n");
+        printf("Successfully read data and store to feature vectors in Data  \n");
     }
     else
     {
