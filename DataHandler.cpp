@@ -60,10 +60,9 @@ void DataHandler::readFeatureData(const std::string &path)
                     exit(1);
                 }
             }
-
             dataArray ->push_back(d);
         }
-        printf("Successfully read data and store to feature vectors in Data  \n");
+        printf("Successfully read and stored  features. size : %zu \n" , dataArray->size());
     }
     else
     {
@@ -74,6 +73,32 @@ void DataHandler::readFeatureData(const std::string &path)
 
 void DataHandler::readFeatureLabels(const std::string &path) {
 
+    uint32_t header[2];  //Madic , num of images
+    unsigned char bytes[2];
+    File *f = fopen(path.c_str(), "r");
+    if (f){
+        for (int i=0; i<2; i++){
+           if (fread(bytes, sizeof(bytes) , 1 , f)){
+               header[i] = convertToLittleEndian(bytes);
+           }
+        }
+        printf("Done getting label file header. \n");
+
+        for (int i = 0; i < header[1]; i++ ) {
+            uint8_t element[1];
+            if (fread(element, sizeof(element) ,1 ,f)){
+                dataArray->at(i)->setLabel(element[0]);
+            }
+            else{
+                printf("Error reading label file. \n");
+                exit(1);
+            }
+        }
+        printf("Successfully read and stored label Data. Size: %zu\n", dataArray->size());
+    }
+    else {
+        printf("Could not find file");
+    }
 }
 
 void DataHandler::splitData()
