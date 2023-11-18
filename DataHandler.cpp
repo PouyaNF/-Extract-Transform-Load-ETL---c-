@@ -103,10 +103,54 @@ void DataHandler::readFeatureLabels(const std::string &path) {
 
 void DataHandler::splitData()
 {
+    std::unordered_set<int> usedIndexes;
+    int trainSize = dataArray->size() * TRAIN_SET_PERCENT;
+    int testSize = dataArray->size() * TEST_SET_PERCENT;
+    int validateSize = dataArray->size() * VALIDATION_SET_PERCENT;
 
+    // creation of training data
+    int count = 0;
+    while (count < trainSize){
+        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
+        // if the index is not in usedIndexes set
+        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
+            trainingData->push_back(dataArray->at(randIndex));
+            usedIndexes.insert(randIndex);
+        count ++;
+        }
+    }
+
+    // creation of test data
+    count = 0;
+    while (count < testSize){
+        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
+        // if the index is not in usedIndexes set
+        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
+            testData->push_back(dataArray->at(randIndex));
+            usedIndexes.insert(randIndex);
+            count ++;
+        }
+    }
+
+    // creation of validation data
+    count = 0;
+    while (count < validateSize){
+        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
+        // if the index is not in usedIndexes set
+        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
+            validationData->push_back(dataArray->at(randIndex));
+            usedIndexes.insert(randIndex);
+            count ++;
+        }
+    }
+
+    printf("Training Data Size: %zu  \n" , trainingData->size());
+    printf("Test Data Size: %zu  \n" , testData->size());
+    printf("Validation Data Size: %zu  \n" , validationData->size());
 }
 
 void DataHandler::countClasses() {
+
 
 }
 
@@ -115,14 +159,14 @@ uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
 }
 
 const std::vector<Data *> &DataHandler::getTrainingData() const {
-    return <#initializer#>;
+    return ;
 }
 
 const std::vector<Data *> &DataHandler::getTestData() const {
-    return <#initializer#>;
+    return ;
 }
 
 const std::vector<Data *> &DataHandler::getValidationData() const {
-    return <#initializer#>;
+    return ;
 }
 
