@@ -158,15 +158,15 @@ uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
     return 0;
 }
 
-const std::vector<Data *> &DataHandler::getTrainingData() const {
-    return ;
+const std::vector<Data *> * DataHandler::getTrainingData() const {
+    return trainingData;
 }
 
-const std::vector<Data *> &DataHandler::getTestData() const {
-    return ;
+const std::vector<Data *> *DataHandler::getTestData() const {
+    return testData;
 }
 
-const std::vector<Data *> &DataHandler::getValidationData() const {
-    return ;
+const std::vector<Data *> * DataHandler::getValidationData() const {
+    return validationData ;
 }
 
