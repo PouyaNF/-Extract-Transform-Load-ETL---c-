@@ -1,4 +1,3 @@
-
 #include "DataHandler.h"
 
 
@@ -150,11 +149,25 @@ void DataHandler::splitData()
 }
 
 void DataHandler::countClasses() {
+    int count =0;
+    for (unsigned i = 0; i< dataArray->size(); i++){
 
-
+        // std::map<uint8_t, int> classMap;
+        if (classMap.find(dataArray->at(i)->getLabel()) == classMap.end()){
+            dataArray->at(i)->setEnumeratedLabel(count);
+            count++;
+        }
+    }
+    numClasses = count;
+    printf("Successfully Extract %d unique classes. \n", numClasses);
 }
 
 uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
+
+
+
+
+
     return 0;
 }
 

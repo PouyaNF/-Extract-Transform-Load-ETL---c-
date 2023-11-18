@@ -1,5 +1,3 @@
-
-
 #include "Data.h"
 
 Data::Data() {
@@ -36,7 +34,7 @@ void Data::setEnumeratedLabel(const int val)
 // Get the size of the feature vector.
 int Data::getFeatureVectorSize() const
 {
-    return featureVector->size();
+    return static_cast<int>(featureVector->size());
 }
 
 // Get the label.
