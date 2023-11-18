@@ -54,7 +54,7 @@ public:
     void countClasses();
 
     // Convert bytes to little-endian
-    uint32_t convertToLittleEndian(const unsigned char* bytes);
+    static uint32_t convertToLittleEndian(const unsigned char* bytes);
 
     const std::vector<Data*>* getTrainingData() const;
     const std::vector<Data*>* getTestData() const;

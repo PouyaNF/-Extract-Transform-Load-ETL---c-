@@ -164,11 +164,7 @@ void DataHandler::countClasses() {
 
 uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
 
-
-
-
-
-    return 0;
+    return (uint32_t) (  (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) |(bytes[3])  ) ;
 }
 
 const std::vector<Data *> * DataHandler::getTrainingData() const {
