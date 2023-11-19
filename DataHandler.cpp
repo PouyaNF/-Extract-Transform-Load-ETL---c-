@@ -15,7 +15,7 @@ DataHandler::~DataHandler() = default;
 
 
 //reads image data from a binary file specified by the path
-void DataHandler::readFeatureData(const std::string &path)
+void DataHandler::readFeatureVector(const std::string &path)
 {
     // to store header
     uint32_t header[4];  //32 bits unsigned integer array : Magic, num of images, row size, col size
@@ -39,14 +39,14 @@ void DataHandler::readFeatureData(const std::string &path)
         printf ("done getting input file header.\n");
 
         // getting number of all images
-        int imageSize = static_cast<int>(header[2] * header[3]);
+        int imageSize = header[2] * header[3];
 
         // for all number of images in binary file
         for (int i =0; i < header[1]; i++)
         {
             Data * d = new Data();
             uint8_t element[1]; // 1 byte
-            for (int j = o; j < imageSize; j++)
+            for (int j = 0; j < imageSize; j++)
             {
                 //reading image data and store in element
                 if(fread(element, sizeof(element), 1, f))
@@ -55,7 +55,7 @@ void DataHandler::readFeatureData(const std::string &path)
                 }
                 else
                 {
-                    printf("Error reading from file. \n");
+                    printf("Error reading image data from file \n");
                     exit(1);
                 }
             }
@@ -74,7 +74,7 @@ void DataHandler::readFeatureLabels(const std::string &path) {
 
     uint32_t header[2];  //Madic , num of images
     unsigned char bytes[2];
-    File *f = fopen(path.c_str(), "r");
+    FILE *f = fopen(path.c_str(), "r");
     if (f){
         for (int i=0; i<2; i++){
            if (fread(bytes, sizeof(bytes) , 1 , f)){

@@ -11,6 +11,8 @@
 
 #include <fstream>
 #include <cstdint>
+#include <cstdio>
+
 #include <vector>
 #include <string>
 #include <map>
@@ -44,7 +46,7 @@ public:
     ~DataHandler();
 
     // Read data file
-    void readFeatureData(const std::string& path);
+    void readFeatureVector(const std::string& path);
     // Read label file
     void readFeatureLabels(const std::string& path);
 
