@@ -23,7 +23,7 @@ void DataHandler::readFeatureVector(const std::string &path)
     //Using unsigned char for raw binary data
     unsigned char bytes[4];
     //opens the file specified by the path
-    FILE *f = fopen(path.c_str(), "r");
+    FILE *f = fopen(path.c_str(), "rb");
     if (f)
     {
         //reading the first 4 bytes of header
@@ -32,15 +32,26 @@ void DataHandler::readFeatureVector(const std::string &path)
             // if successfully reads one element of size sizeof(bytes)
             if (fread(bytes,sizeof(bytes), 1, f))
             {
+                printf("Raw bytes for header[%d]: ", i);
+                for (int j = 0; j < sizeof(bytes); j++) {
+                    printf("%02X ", bytes[j]);
+                }
+                printf("\n");
+
                 //handle potential endianness differences between the data in the file and the system's native endianness
                 header[i] = convertToLittleEndian(bytes);
+
+
             }
         }
-        printf ("done getting input file header.\n");
 
-        // getting number of all images
-        int imageSize = header[2] * header[3];
+        printf ("done getting file headers for Train Images: \n");
 
+        std::cout << "Magic: " << header[0] << ", Num of Images: " << header[1] << std::endl;
+        std::cout << "Image row size: " << header[2] << ",  Image col size: " << header[3] << std::endl;
+
+
+        int imageSize = header[2] * header[3] ;
         // for all number of images in binary file
         for (int i =0; i < header[1]; i++)
         {
@@ -53,9 +64,23 @@ void DataHandler::readFeatureVector(const std::string &path)
                 {
                     d->appendToFeatureVector(element[0]);
                 }
+                // Error Handling
                 else
                 {
-                    printf("Error reading image data from file \n");
+                    if (feof(f)){
+                        // End of file reached
+                        std::cerr << "Error: End of file reached while reading image data.\n";
+                    }
+                    else if (ferror(f)) {
+                        // An error occurred during reading
+                        std::cerr << "Error reading image data from file. File error occurred.\n";
+                    }
+                    else {
+                    // Some other issue occurred
+                    std::cerr << "Error reading image data from file. Unknown error.\n";
+                    }
+                    std::cerr << "i = " << i << ", j = " << j << ", imageSize = " << imageSize << "\n";
+                    fclose(f);
                     exit(1);
                 }
             }
@@ -72,24 +97,47 @@ void DataHandler::readFeatureVector(const std::string &path)
 
 void DataHandler::readFeatureLabels(const std::string &path) {
 
-    uint32_t header[2];  //Madic , num of images
-    unsigned char bytes[2];
-    FILE *f = fopen(path.c_str(), "r");
+    uint32_t header[2];  // Magic | num of images
+    unsigned char bytes[4];
+    FILE *f = fopen(path.c_str(), "rb");
     if (f){
         for (int i=0; i<2; i++){
            if (fread(bytes, sizeof(bytes) , 1 , f)){
+
+               printf("Raw bytes for header[%d]: ", i);
+               for (int j = 0; j < sizeof(bytes); j++) {
+                   printf("%02X ", bytes[j]);
+               }
+               printf("\n");
+
                header[i] = convertToLittleEndian(bytes);
            }
         }
+
         printf("Done getting label file header. \n");
+        std::cout << "Magic: " << header[0] << ", Num of Images: " << header[1] << std::endl;
 
         for (int i = 0; i < header[1]; i++ ) {
             uint8_t element[1];
             if (fread(element, sizeof(element) ,1 ,f)){
                 dataArray->at(i)->setLabel(element[0]);
+                //std::cout << "Label[" << i << "]: " << static_cast<int>(element[0]) << '\n';
             }
             else{
-                printf("Error reading label file. \n");
+                if (feof(f)){
+                    // End of file reached
+                    std::cerr << "Error: End of file reached while reading image data.\n";
+                }
+                else if (ferror(f)) {
+                    // An error occurred during reading
+                    std::cerr << "Error reading image data from file. File error occurred.\n";
+                }
+                else {
+                    // Some other issue occurred
+                    std::cerr << "Error reading image data from file. Unknown error.\n";
+                }
+                std::cerr << "i = " << i << "\n";
+                fclose(f);
                 exit(1);
             }
         }
@@ -166,6 +214,11 @@ uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
 
     return (uint32_t) (  (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) |(bytes[3])  ) ;
 }
+
+
+
+
+
 
 const std::vector<Data *> * DataHandler::getTrainingData() const {
     return trainingData;

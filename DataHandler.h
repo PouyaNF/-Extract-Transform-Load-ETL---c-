@@ -10,9 +10,8 @@
 #define INC_8_TRAINING_MNIST_DATAHANDLER_H
 
 #include <fstream>
-#include <cstdint>
 #include <cstdio>
-
+#include <iostream>
 #include <vector>
 #include <string>
 #include <map>
@@ -58,9 +57,9 @@ public:
     // Convert bytes to little-endian
     static uint32_t convertToLittleEndian(const unsigned char* bytes);
 
-    const std::vector<Data*>* getTrainingData() const;
-    const std::vector<Data*>* getTestData() const;
-    const std::vector<Data*>* getValidationData() const;
+    [[nodiscard]] const std::vector<Data*>* getTrainingData() const;
+    [[nodiscard]] const std::vector<Data*>* getTestData() const;
+    [[nodiscard]] const std::vector<Data*>* getValidationData() const;
 };
 
 
