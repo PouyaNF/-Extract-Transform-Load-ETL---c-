@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <random>
 #include "DataHandler.h"
 
 
@@ -115,7 +117,7 @@ void DataHandler::readFeatureLabels(const std::string &path) {
         }
 
         printf("Done getting label file header. \n");
-        std::cout << "Magic: " << header[0] << ", Num of Images: " << header[1] << std::endl;
+        std::cout << "Magic: " << header[0] << ", Num of Labels: " << header[1] << std::endl;
 
         for (int i = 0; i < header[1]; i++ ) {
             uint8_t element[1];
@@ -148,60 +150,35 @@ void DataHandler::readFeatureLabels(const std::string &path) {
     }
 }
 
-void DataHandler::splitData()
-{
-    std::unordered_set<int> usedIndexes;
-    int trainSize = dataArray->size() * TRAIN_SET_PERCENT;
-    int testSize = dataArray->size() * TEST_SET_PERCENT;
-    int validateSize = dataArray->size() * VALIDATION_SET_PERCENT;
 
-    // creation of training data
-    int count = 0;
-    while (count < trainSize){
-        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
-        // if the index is not in usedIndexes set
-        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
-            trainingData->push_back(dataArray->at(randIndex));
-            usedIndexes.insert(randIndex);
-        count ++;
-        }
-    }
 
-    // creation of test data
-    count = 0;
-    while (count < testSize){
-        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
-        // if the index is not in usedIndexes set
-        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
-            testData->push_back(dataArray->at(randIndex));
-            usedIndexes.insert(randIndex);
-            count ++;
-        }
-    }
+void DataHandler::splitData() {
+    float trainSize = dataArray->size() * TRAIN_SET_PERCENT;
+    float testSize = dataArray->size() * TEST_SET_PERCENT;
 
-    // creation of validation data
-    count = 0;
-    while (count < validateSize){
-        int randIndex = rand() % dataArray->size();  // number between rand and dataArray->size()-1
-        // if the index is not in usedIndexes set
-        if ( (usedIndexes.find(randIndex)) == usedIndexes.end() ){
-            validationData->push_back(dataArray->at(randIndex));
-            usedIndexes.insert(randIndex);
-            count ++;
-        }
-    }
+    std::shuffle(dataArray->begin(), dataArray->end(), std::mt19937(std::random_device()()));
+
+    // Assuming TRAIN_SET_PERCENT, TEST_SET_PERCENT, and VALIDATION_SET_PERCENT are floats between 0 and 1
+    int trainEnd = trainSize;
+    int testEnd = trainEnd + testSize;
+
+    trainingData->insert(trainingData->end(), dataArray->begin(), dataArray->begin() + trainEnd);
+    testData->insert(testData->end(), dataArray->begin() + trainEnd, dataArray->begin() + testEnd);
+    validationData->insert(validationData->end(), dataArray->begin() + testEnd, dataArray->end());
 
     printf("Training Data Size: %zu  \n" , trainingData->size());
     printf("Test Data Size: %zu  \n" , testData->size());
     printf("Validation Data Size: %zu  \n" , validationData->size());
 }
 
+/*
 void DataHandler::countClasses() {
     int count =0;
-    for (unsigned i = 0; i< dataArray->size(); i++){
-
+    for (unsigned i = 0; i< dataArray->size(); i++)
+    {
         // std::map<uint8_t, int> classMap;
         if (classMap.find(dataArray->at(i)->getLabel()) == classMap.end()){
+            std::cout<<static_cast<int>(dataArray->at(i)->getLabel())<<std::endl;
             dataArray->at(i)->setEnumeratedLabel(count);
             count++;
         }
@@ -209,6 +186,38 @@ void DataHandler::countClasses() {
     numClasses = count;
     printf("Successfully Extract %d unique classes. \n", numClasses);
 }
+*/
+
+
+void DataHandler::countClasses() {
+    int count = 0;
+
+    for (unsigned i = 0; i < dataArray->size(); i++) {
+        uint8_t label = dataArray->at(i)->getLabel();
+
+        if (classMap.find(label) == classMap.end()) {
+            classMap[label] = count;
+            dataArray->at(i)->setEnumeratedLabel(count);
+            count++;
+        }
+        else
+        {
+            // If the label already exists in classMap, set the enumerated label accordingly.
+            dataArray->at(i)->setEnumeratedLabel(classMap[label]);
+        }
+
+        //std::cout << static_cast<int>(label) << std::endl;
+    }
+    numClasses = count;
+    printf("Successfully Extract %d unique classes. \n", numClasses);
+}
+
+
+
+
+
+
+
 
 uint32_t DataHandler::convertToLittleEndian(const unsigned char *bytes) {
 
